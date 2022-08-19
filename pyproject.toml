@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "speechifiy"
+version = "0.1.0"
+description = ""
+authors = ["Nick Blackburn <nickblackburn02@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+colorama = "^0.4.5"
+speech-recognition-python = "^3.9.9"
+pyaudio-wheels = "^0.0.1"
+PyAudio = "^0.2.12"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

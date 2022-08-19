@@ -7,9 +7,7 @@ authors = ["Nick Blackburn <nickblackburn02@gmail.com>"]
 [tool.poetry.dependencies]
 python = "^3.10"
 colorama = "^0.4.5"
-speech-recognition-python = "^3.9.9"
-pyaudio-wheels = "^0.0.1"
-PyAudio = "^0.2.12"
+pyo = "^1.0.4"
 
 [tool.poetry.dev-dependencies]
 

@@ -3,6 +3,7 @@ this class is for handling taking mic input
 """
 import audioop
 import math
+from multiprocessing import Process
 
 import numpy as np
 from utils import ConsoleLog as log
@@ -41,6 +42,7 @@ def getvoice():
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
   
+    P = Process(name="playsound",target=playy)
 
      # start Recording
     stream = audio.open(format=FORMAT, channels=CHANNELS,
@@ -53,19 +55,17 @@ def getvoice():
     # play and record loop 
     while const.voicetest == 1:
 
-        # audio frames
-        data = stream.read(CHUNK,exception_on_overflow = False)
+        # audio stream
+        const.data = stream.read(CHUNK,exception_on_overflow = False)
 
-        # deisabkels
-        rms = audioop.rms(data, 2) + 0.001
+        
+        rms = audioop.rms(const.data, 2) + 0.001
         decibel = 20 * math.log(rms, 10)
         print(decibel)
 
 
-        sa.play_buffer(data, 1, 2, 44100)
-        if(decibel >=1.00 ):
-            log.info("playing modified audio")
-            #sa.play_buffer(data, 1, 2, 44100)
+        if(decibel >=-1.00 ):
+           P.start() # Inititialize Process
         else:
             log.Warning("found sicelance")
 
@@ -78,3 +78,5 @@ def getvoice():
     audio.terminate()
 
 
+def playy():
+    sa.play_buffer(const.data, 1, 2,sample_rate=44100)

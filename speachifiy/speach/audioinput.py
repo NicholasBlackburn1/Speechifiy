@@ -7,6 +7,8 @@ import wave # Python 3 module for reading / writing simple .wav files
 import librosa
 from IPython.display import Audio
 import simpleaudio as sa
+from utils import const
+
 """
 need to get realtime audio processing working
 """
@@ -35,29 +37,34 @@ def getvoice():
     for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
-  
-
-    # start Recording
     
+ 
     stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, input=True,input_device_index =9,
+                    rate=RATE, input=True,input_device_index =7,
                     frames_per_buffer=CHUNK)
     print ("recording started")
-    Recordframes = []
-    
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+
+    # play and record loop 
+    while const.voicetest == 1:
+
+        # start Recording
+
+        Recordframes = []
+
         data = stream.read(CHUNK,exception_on_overflow = False)
-        Recordframes.append(data)
-      
 
-    print ("recording stopped")
-    sa.play_buffer(Recordframes, 1,2,44100)
+        log.info("playing modified audio")
+        play_obj =  sa.play_buffer(data, 1,2,44100)
 
-
-
+    
+    log.Warning("audio stream is done playing ")
     # Stop Recording
     stream.stop_stream()
     stream.close()
     audio.terminate()
 
-    
+
+
+        
+
+        

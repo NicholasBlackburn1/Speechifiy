@@ -5,6 +5,11 @@ from utils import ConsoleLog as log
 import pyaudio # Soundcard audio I/O access library
 import wave # Python 3 module for reading / writing simple .wav files
 import librosa
+from IPython.display import Audio
+import simpleaudio as sa
+"""
+need to get realtime audio processing working
+"""
 
 # Setup channel info
 FORMAT = pyaudio.paInt16 # data type formate
@@ -21,19 +26,33 @@ audio = pyaudio.PyAudio()
 def getvoice():
     log.Warning("starting audio collection....")
 
-    # start Recording
-    stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, input=True,
-                    frames_per_buffer=CHUNK,input_device_index=1)
-    log.Debug(" recording...")
-    frames = []
 
-    # Record for RECORD_SECONDS
-    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
-        data = stream.read(CHUNK)
-        frames.append(data)
+
+    p = pyaudio.PyAudio()
+    info = p.get_host_api_info_by_index(0)
+    numdevices = info.get('deviceCount')
+
+    for i in range(0, numdevices):
+        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
+  
+
+    # start Recording
     
-    log.Debug(" Done recording...")
+    stream = audio.open(format=FORMAT, channels=CHANNELS,
+                    rate=RATE, input=True,input_device_index =9,
+                    frames_per_buffer=CHUNK)
+    print ("recording started")
+    Recordframes = []
+    
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK,exception_on_overflow = False)
+        Recordframes.append(data)
+      
+
+    print ("recording stopped")
+    sa.play_buffer(Recordframes, 1,2,44100)
+
 
 
     # Stop Recording
@@ -41,31 +60,4 @@ def getvoice():
     stream.close()
     audio.terminate()
 
-    log.Warning("Creating wav file ....")
-    # Write your new .wav file with built in Python 3 Wave module
-    waveFile = wave.open("test.wav", 'wb')
-    waveFile.setnchannels(CHANNELS)
-    waveFile.setsampwidth(audio.get_sample_size(FORMAT))
-    waveFile.setframerate(RATE)
-    waveFile.writeframes(b''.join(frames))
-    waveFile.close()
-
-    log.PipeLine_Ok("created audio file...")
-
-    # should be output of ptich
-    log.Warning("chaning pitch of file")
-
-    y, sr = librosa.load('your_file.wav', sr=16000)
-    y_third = librosa.effects.pitch_shift(y, sr=sr, n_steps=4)
-    
-    log.PipeLine_Ok("changed output pitch ....")
-    
-    # should save output file
-    log.Warning("saving output file....")
-    
-    librosa.output.write_wav("unreadable.wav", y_third,sr)
-
-    log.PipeLine_Ok("saved output file....")
-
-    log.Warning("playing audio file")
     

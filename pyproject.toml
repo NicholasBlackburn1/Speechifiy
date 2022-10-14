@@ -5,11 +5,14 @@ description = ""
 authors = ["Nick Blackburn <nickblackburn02@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9.5"
 colorama = "^0.4.5"
-pyo = "^1.0.4"
 PyAudio = "^0.2.12"
 librosa = "^0.9.2"
+ipython = "^8.4.0"
+pydub = "^0.25.1"
+sounddevice = "^0.4.5"
+simpleaudio = "^1.0.4"
 
 [tool.poetry.dev-dependencies]
 

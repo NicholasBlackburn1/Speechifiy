@@ -1,6 +1,10 @@
 """
 this class is for handling taking mic input
 """
+import audioop
+import math
+
+import numpy as np
 from utils import ConsoleLog as log
 import pyaudio # Soundcard audio I/O access library
 import wave # Python 3 module for reading / writing simple .wav files
@@ -8,7 +12,6 @@ import librosa
 from IPython.display import Audio
 import simpleaudio as sa
 from utils import const
-
 """
 need to get realtime audio processing working
 """
@@ -37,24 +40,35 @@ def getvoice():
     for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
-    
- 
+  
+
+     # start Recording
     stream = audio.open(format=FORMAT, channels=CHANNELS,
-                    rate=RATE, input=True,input_device_index =7,
+                rate=RATE, input=True,input_device_index = 6,
                     frames_per_buffer=CHUNK)
     print ("recording started")
 
+
+    
     # play and record loop 
     while const.voicetest == 1:
 
-        # start Recording
-
-        Recordframes = []
-
+        # audio frames
         data = stream.read(CHUNK,exception_on_overflow = False)
 
-        log.info("playing modified audio")
-        play_obj =  sa.play_buffer(data, 1,2,44100)
+        # deisabkels
+        rms = audioop.rms(data, 2) + 0.001
+        decibel = 20 * math.log(rms, 10)
+        print(decibel)
+
+
+        sa.play_buffer(data, 1, 2, 44100)
+        if(decibel >=1.00 ):
+            log.info("playing modified audio")
+            #sa.play_buffer(data, 1, 2, 44100)
+        else:
+            log.Warning("found sicelance")
+
 
     
     log.Warning("audio stream is done playing ")
@@ -64,7 +78,3 @@ def getvoice():
     audio.terminate()
 
 
-
-        
-
-        
